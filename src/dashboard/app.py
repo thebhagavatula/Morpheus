@@ -34,7 +34,6 @@ from src.data.universe import SUPPORTED_INDEXES
 # ── Page Config ───────────────────────────────────────────────────────
 st.set_page_config(
     page_title="MORPHEUS // Factor Model",
-    page_icon="🟢",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -207,7 +206,7 @@ def render_sidebar():
         )
         st.markdown(
             f'<p style="text-align: center; color: {MATRIX_DIM}; '
-            f'font-size: 0.65rem; letter-spacing: 2px; margin-top: 2px;">'
+            f'font-size: 0.8rem; letter-spacing: 2px; margin-top: 2px;">'
             f'FACTOR MODEL v2.0</p>',
             unsafe_allow_html=True,
         )
@@ -223,7 +222,7 @@ def render_sidebar():
         status_icon = "⬤" if has_data else "◯"
         data_color = MATRIX_GREEN if has_data else MATRIX_AMBER
         st.markdown(
-            f'<p style="color: {data_color}; font-size: 0.7rem; '
+            f'<p style="color: {data_color}; font-size: 0.85rem; '
             f'text-align: center; letter-spacing: 1px; margin: 4px 0;">'
             f'{status_icon} {data_status}</p>',
             unsafe_allow_html=True,
@@ -243,7 +242,7 @@ def render_sidebar():
         # Show index description
         idx_info = SUPPORTED_INDEXES.get(selected_index, {})
         st.markdown(
-            f'<p style="color: {MATRIX_DIM}; font-size: 0.6rem; '
+            f'<p style="color: {MATRIX_DIM}; font-size: 0.8rem; '
             f'text-align: center; margin-top: -8px;">'
             f'{idx_info.get("description", "")}</p>',
             unsafe_allow_html=True,
@@ -254,14 +253,14 @@ def render_sidebar():
         # ── Navigation ────────────────────────────────────────────────
         page = st.radio(
             "▸ NAVIGATION",
-            ["⬡ Overview", "λ Factor Premia", "◎ IC Analysis",
-             "◈ Portfolio", "⚡ Regime"],
+            ["Overview", "Factor Premia", "IC Analysis",
+             "Portfolio", "Regime"],
             label_visibility="visible",
         )
 
         st.markdown("---")
         st.markdown(
-            f'<p style="color: {MATRIX_DARK}; font-size: 0.55rem; '
+            f'<p style="color: {MATRIX_MUTED}; font-size: 0.75rem; '
             f'text-align: center; letter-spacing: 1px;">'
             f'THE MATRIX HAS YOU</p>',
             unsafe_allow_html=True,
@@ -560,14 +559,14 @@ def page_portfolio(data, selected_index="S&P 500"):
     fig.add_trace(go.Heatmap(
         z=pivot.values, x=pivot.columns, y=pivot.index,
         colorscale=[
-            [0, MATRIX_RED], [0.3, '#1a0a0a'],
-            [0.5, MATRIX_BLACK], [0.7, MATRIX_DARK],
-            [1.0, MATRIX_GREEN],
+            [0, '#b3142c'], [0.3, '#2a0d12'],
+            [0.5, MATRIX_BLACK], [0.7, '#0b3d12'],
+            [1.0, '#007a1f'],
         ],
         zmin=-0.08, zmax=0.08,
         text=np.vectorize(lambda x: f"{x:.1%}" if not np.isnan(x) else "")(pivot.values),
         texttemplate="%{text}",
-        textfont=dict(size=10, color=MATRIX_TEXT),
+        textfont=dict(size=12, color='#ffffff'),
     ))
     fig.update_layout(
         title="MONTHLY RETURNS HEATMAP",
@@ -697,15 +696,15 @@ def main():
     data = load_data(selected_index)
     st.session_state["selected_index"] = selected_index
 
-    if page == "⬡ Overview":
+    if page == "Overview":
         page_overview(data, selected_index)
-    elif page == "λ Factor Premia":
+    elif page == "Factor Premia":
         page_factor_premia(data, selected_index)
-    elif page == "◎ IC Analysis":
+    elif page == "IC Analysis":
         page_ic_analysis(data, selected_index)
-    elif page == "◈ Portfolio":
+    elif page == "Portfolio":
         page_portfolio(data, selected_index)
-    elif page == "⚡ Regime":
+    elif page == "Regime":
         page_regime(data, selected_index)
 
 

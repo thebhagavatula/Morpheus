@@ -16,7 +16,7 @@ MATRIX_AMBER = "#ffb000"
 MATRIX_RED   = "#ff2040"
 MATRIX_GREY  = "#1a1a1a"
 MATRIX_TEXT  = "#b0ffb0"
-MATRIX_MUTED = "#2a6e2a"
+MATRIX_MUTED = "#4fa84f"   # >=7:1 on MATRIX_BLACK (was #2a6e2a, 3.2:1)
 
 # Colours for chart series
 CHART_COLORS = [
@@ -40,7 +40,7 @@ def _rain_columns_css(n_cols: int = 30) -> str:
         delay = random.uniform(0, 8)
         duration = random.uniform(6, 14)
         char = random.choice(_RAIN_CHARS)
-        opacity = random.uniform(0.15, 0.4)
+        opacity = random.uniform(0.06, 0.16)
         cols.append(
             f'.rain-col-{i} {{'
             f'  left: {left:.1f}%;'
@@ -68,6 +68,7 @@ MATRIX_RAIN_CSS = f"""
     pointer-events: none;
     z-index: 0;
     overflow: hidden;
+    user-select: none;
 }}
 
 .rain-col {{
@@ -92,6 +93,43 @@ MATRIX_RAIN_CSS = f"""
 }}
 
 {_rain_columns_css(30)}
+"""
+
+
+# ── Accessibility (WCAG 2.2 AA) ───────────────────────────────────────
+A11Y_CSS = f"""
+/* Keep all page content above the decorative rain overlay */
+.block-container, section[data-testid="stSidebar"] > div {{
+    position: relative;
+    z-index: 1;
+}}
+
+/* Visible keyboard focus (WCAG 2.4.7) */
+:focus-visible,
+.stButton > button:focus-visible,
+.stTabs [data-baseweb="tab"]:focus-visible,
+div[role="radiogroup"] label:focus-within,
+div[data-baseweb="select"]:focus-within {{
+    outline: 2px solid {MATRIX_AMBER} !important;
+    outline-offset: 2px;
+}}
+
+/* Body copy: comfortable size and line height */
+.stApp p, .stApp li, .stMarkdown {{
+    font-size: 1rem;
+    line-height: 1.6;
+}}
+.stTabs [data-baseweb="tab"] {{ font-size: 0.95rem !important; }}
+div[data-testid="stMetric"] div[data-testid="stMetricValue"] {{
+    text-shadow: 0 0 6px rgba(0, 255, 65, 0.4) !important;
+}}
+
+/* Respect reduced-motion preference (WCAG 2.3.3) */
+@media (prefers-reduced-motion: reduce) {{
+    .matrix-rain {{ display: none !important; }}
+    .glow {{ animation: none !important; }}
+    * {{ transition: none !important; animation: none !important; }}
+}}
 """
 
 
@@ -153,7 +191,7 @@ div[data-testid="stMetric"] label {{
     font-family: 'Share Tech Mono', monospace !important;
     text-transform: uppercase;
     letter-spacing: 2px;
-    font-size: 11px !important;
+    font-size: 13px !important;
 }}
 div[data-testid="stMetric"] div[data-testid="stMetricValue"] {{
     color: {MATRIX_GREEN} !important;
@@ -169,8 +207,9 @@ div[data-testid="stMetric"] div[data-testid="stMetricDelta"] > div {{
 h1, h2, h3 {{
     font-family: 'Orbitron', sans-serif !important;
     color: {MATRIX_GREEN} !important;
-    text-shadow: 0 0 20px {MATRIX_GREEN}, 0 0 40px {MATRIX_DARK};
-    letter-spacing: 3px;
+    text-shadow: 0 0 8px rgba(0, 255, 65, 0.45);
+    letter-spacing: 2px;
+    line-height: 1.3;
 }}
 h1 {{
     font-size: 2.2rem !important;
@@ -298,7 +337,7 @@ h1 {{
 #matrix-clock .clock-label {{
     font-family: 'Share Tech Mono', monospace;
     color: {MATRIX_DIM};
-    font-size: 0.6rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 3px;
     display: block;
@@ -312,13 +351,15 @@ h1 {{
     font-family: 'Share Tech Mono', monospace !important;
     text-transform: uppercase !important;
     letter-spacing: 1px !important;
-    font-size: 0.7rem !important;
+    font-size: 0.85rem !important;
 }}
 .stRadio label {{
     font-family: 'Share Tech Mono', monospace !important;
     letter-spacing: 0.5px !important;
-    font-size: 0.85rem !important;
+    font-size: 1rem !important;
 }}
+
+{A11Y_CSS}
 
 {MATRIX_RAIN_CSS}
 </style>
@@ -334,7 +375,7 @@ def get_plotly_template():
         layout=go.Layout(
             paper_bgcolor=MATRIX_BLACK,
             plot_bgcolor=MATRIX_BG,
-            font=dict(family="Share Tech Mono, Courier New, monospace", color=MATRIX_TEXT, size=12),
+            font=dict(family="Share Tech Mono, Courier New, monospace", color=MATRIX_TEXT, size=13),
             title=dict(font=dict(family="Orbitron, sans-serif", color=MATRIX_GREEN, size=18)),
             xaxis=dict(
                 gridcolor=MATRIX_GREY, zerolinecolor=MATRIX_DARK,
@@ -372,7 +413,7 @@ def live_clock_html() -> str:
     <div id="matrix-clock"
          style="font-family: 'Orbitron', monospace;
                 color: {MATRIX_GREEN};
-                font-size: 1.05rem;
+                font-size: 1.1rem;
                 letter-spacing: 2px;
                 text-shadow: 0 0 10px {MATRIX_GREEN}, 0 0 20px {MATRIX_DARK};
                 text-align: center;
@@ -381,7 +422,7 @@ def live_clock_html() -> str:
         <span class="clock-label"
               style="font-family: 'Share Tech Mono', monospace;
                      color: {MATRIX_DIM};
-                     font-size: 0.55rem;
+                     font-size: 0.75rem;
                      text-transform: uppercase;
                      letter-spacing: 3px;
                      display: block;
